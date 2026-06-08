@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PT TechNova Indonesia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar"></aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <div>
+                <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+                <p style="margin:0;color:#64748b;font-size:.875rem;" id="welcomeMsg">Selamat datang!</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:.75rem;">
+                <div style="width:40px;height:40px;border-radius:50%;background:#3b82f6;color:white;
+                            display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;"
+                     id="userAvatar">A</div>
+                <span id="userName" style="font-weight:500;color:#1e293b;"></span>
+            </div>
+        </header>
+
+        <div class="admin-content">
+
+            <!-- Stat cards -->
+            <div class="dash-stats">
+                <div class="dash-stat" onclick="location.href='services.html'" style="cursor:pointer;">
+                    <div class="dash-stat__icon" style="background:#eff6ff;color:#3b82f6;">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="dash-stat__info">
+                        <h3 id="servicesCount">—</h3>
+                        <p>Services</p>
+                    </div>
+                    <i class="fas fa-arrow-right dash-stat__arrow"></i>
+                </div>
+
+                <div class="dash-stat" onclick="location.href='team.html'" style="cursor:pointer;">
+                    <div class="dash-stat__icon" style="background:#f0fdf4;color:#22c55e;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="dash-stat__info">
+                        <h3 id="teamCount">—</h3>
+                        <p>Tim</p>
+                    </div>
+                    <i class="fas fa-arrow-right dash-stat__arrow"></i>
+                </div>
+
+                <div class="dash-stat" onclick="location.href='messages.html'" style="cursor:pointer;">
+                    <div class="dash-stat__icon" style="background:#fff7ed;color:#f97316;">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <div class="dash-stat__info">
+                        <h3 id="totalMsgCount">—</h3>
+                        <p>Total Pesan</p>
+                    </div>
+                    <i class="fas fa-arrow-right dash-stat__arrow"></i>
+                </div>
+
+                <div class="dash-stat" onclick="location.href='messages.html'" style="cursor:pointer;">
+                    <div class="dash-stat__icon" style="background:#fef2f2;color:#ef4444;">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="dash-stat__info">
+                        <h3 id="unreadMsgCount">—</h3>
+                        <p>Belum Dibaca</p>
+                    </div>
+                    <i class="fas fa-arrow-right dash-stat__arrow"></i>
+                </div>
+            </div>
+
+            <!-- Two-column: recent messages + quick actions -->
+            <div class="dash-grid">
+
+                <!-- Recent Messages -->
+                <div class="dash-card">
+                    <div class="dash-card__header">
+                        <h3><i class="fas fa-inbox"></i> Pesan Terbaru</h3>
+                        <a href="messages.html" class="btn btn-sm btn-primary">Lihat Semua</a>
+                    </div>
+                    <div id="recentMessages">
+                        <div style="text-align:center;padding:2rem;color:#94a3b8;">
+                            <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div>
+                    <div class="dash-card" style="margin-bottom:1.25rem;">
+                        <div class="dash-card__header">
+                            <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                        </div>
+                        <div class="dash-actions">
+                            <a href="home.html" class="dash-action">
+                                <i class="fas fa-edit" style="color:#3b82f6;"></i>
+                                <span>Edit Homepage</span>
+                            </a>
+                            <a href="services.html" class="dash-action">
+                                <i class="fas fa-plus-circle" style="color:#22c55e;"></i>
+                                <span>Tambah Service</span>
+                            </a>
+                            <a href="team.html" class="dash-action">
+                                <i class="fas fa-user-plus" style="color:#8b5cf6;"></i>
+                                <span>Tambah Anggota Tim</span>
+                            </a>
+                            <a href="messages.html" class="dash-action">
+                                <i class="fas fa-inbox" style="color:#f97316;"></i>
+                                <span>Kelola Pesan</span>
+                            </a>
+                            <a href="media.html" class="dash-action">
+                                <i class="fas fa-upload" style="color:#06b6d4;"></i>
+                                <span>Upload Gambar</span>
+                            </a>
+                            <a href="settings.html" class="dash-action">
+                                <i class="fas fa-cog" style="color:#64748b;"></i>
+                                <span>Settings Website</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- View Website -->
+                    <div class="dash-card">
+                        <div class="dash-card__header">
+                            <h3><i class="fas fa-globe"></i> Website</h3>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:.75rem;">
+                            <a href="../index.html" target="_blank" class="btn btn-primary" style="justify-content:center;">
+                                <i class="fas fa-external-link-alt"></i> Lihat Website
+                            </a>
+                            <a href="../contact.html" target="_blank" class="btn btn-secondary" style="justify-content:center;">
+                                <i class="fas fa-envelope"></i> Halaman Kontak
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', async function() {
+            const isAdmin = await protectAdminPage();
+            if (!isAdmin) return;
+            loadUserInfo();
+            loadStats();
+            loadRecentMessages();
+        });
+
+        async function loadUserInfo() {
+            try {
+                const user = await getCurrentUser();
+                if (user) {
+                    const name = user.email.split('@')[0];
+                    document.getElementById('userName').textContent = name;
+                    document.getElementById('userAvatar').textContent = name[0].toUpperCase();
+                    document.getElementById('welcomeMsg').textContent =
+                        'Selamat datang, ' + name + '! 👋';
+                }
+            } catch(e) {}
+        }
+
+        async function loadStats() {
+            try {
+                const [servicesRes, teamRes, messagesRes] = await Promise.all([
+                    supabaseClient.from('services').select('*'),
+                    supabaseClient.from('team').select('*'),
+                    supabaseClient.from('contact_messages').select('*')
+                ]);
+
+                const services = servicesRes.data || [];
+                const team = teamRes.data || [];
+                const messages = messagesRes.data || [];
+
+                document.getElementById('servicesCount').textContent  = services.length;
+                document.getElementById('teamCount').textContent      = team.length;
+                document.getElementById('totalMsgCount').textContent  = messages.length;
+
+                const unread = messages.filter(m => !m.is_read).length;
+                const el = document.getElementById('unreadMsgCount');
+                el.textContent = unread;
+                if (unread > 0) el.style.color = '#ef4444';
+
+            } catch(e) {
+                console.warn('Stats error:', e.message);
+            }
+        }
+
+        async function loadRecentMessages() {
+            const container = document.getElementById('recentMessages');
+            try {
+                const { data: messages, error } = await supabaseClient
+                    .from('contact_messages')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (error) throw error;
+                const recent = messages || [];
+
+                if (!recent.length) {
+                    container.innerHTML = `<p style="text-align:center;color:#94a3b8;padding:1.5rem 0;">
+                        Belum ada pesan masuk</p>`;
+                    return;
+                }
+
+                container.innerHTML = recent.map(m => {
+                    const isUnread = !m.is_read;
+                    const initials = m.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+                    const colors   = ['#3b82f6','#8b5cf6','#ec4899','#f59e0b','#10b981','#ef4444'];
+                    let hash = 0;
+                    for (let i = 0; i < m.name.length; i++) hash = m.name.charCodeAt(i) + ((hash<<5)-hash);
+                    const color = colors[Math.abs(hash) % colors.length];
+
+                    const d = new Date(m.created_at);
+                    const dateStr = d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+
+                    return `
+                    <a href="messages.html" class="recent-msg ${isUnread ? 'recent-msg--unread' : ''}">
+                        <div class="recent-msg__avatar" style="background:${color}">${initials}</div>
+                        <div class="recent-msg__body">
+                            <div class="recent-msg__top">
+                                <span class="recent-msg__name">${m.name}</span>
+                                <span class="recent-msg__date">${dateStr}</span>
+                            </div>
+                            <div class="recent-msg__subject">
+                                ${isUnread ? '<span style="width:7px;height:7px;border-radius:50%;background:#3b82f6;display:inline-block;margin-right:5px;flex-shrink:0;"></span>' : ''}
+                                ${m.subject}
+                            </div>
+                        </div>
+                    </a>`;
+                }).join('');
+
+            } catch(e) {
+                container.innerHTML = `<p style="color:#ef4444;padding:1rem;">Gagal memuat pesan.</p>`;
+            }
+        }
+    </script>
+
+    <style>
+        /* ---- Stat cards ---- */
+        .dash-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.75rem;
+        }
+        .dash-stat {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: .75rem;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: box-shadow .2s, transform .2s;
+        }
+        .dash-stat:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-2px); }
+        .dash-stat__icon {
+            width: 52px; height: 52px;
+            border-radius: .75rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.375rem;
+            flex-shrink: 0;
+        }
+        .dash-stat__info h3 { margin: 0; font-size: 1.75rem; font-weight: 700; color: #1e293b; }
+        .dash-stat__info p  { margin: 0; font-size: .8rem; color: #64748b; }
+        .dash-stat__arrow   { margin-left: auto; color: #cbd5e1; font-size: .875rem; }
+
+        /* ---- Two-column layout ---- */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 1.25rem;
+            align-items: start;
+        }
+        @media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+
+        /* ---- Card ---- */
+        .dash-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: .75rem;
+            overflow: hidden;
+        }
+        .dash-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .dash-card__header h3 { margin: 0; font-size: 1rem; color: #1e293b; }
+        .dash-card__header h3 i { margin-right: .5rem; color: #3b82f6; }
+
+        /* ---- Quick actions ---- */
+        .dash-actions { padding: .5rem; display: flex; flex-direction: column; gap: .25rem; }
+        .dash-action {
+            display: flex;
+            align-items: center;
+            gap: .875rem;
+            padding: .875rem 1rem;
+            border-radius: .5rem;
+            text-decoration: none;
+            color: #334155;
+            font-size: .9rem;
+            font-weight: 500;
+            transition: background .15s;
+        }
+        .dash-action:hover { background: #f8fafc; }
+        .dash-action i { width: 20px; text-align: center; font-size: 1.1rem; }
+
+        /* ---- Recent messages ---- */
+        .recent-msg {
+            display: flex;
+            align-items: center;
+            gap: .875rem;
+            padding: .875rem 1.25rem;
+            text-decoration: none;
+            color: inherit;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background .15s;
+        }
+        .recent-msg:last-child { border-bottom: none; }
+        .recent-msg:hover { background: #f8fafc; }
+        .recent-msg--unread { background: #f8fbff; }
+        .recent-msg__avatar {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .875rem;
+            flex-shrink: 0;
+        }
+        .recent-msg__body { flex: 1; min-width: 0; }
+        .recent-msg__top {
+            display: flex; justify-content: space-between;
+            margin-bottom: .2rem;
+        }
+        .recent-msg__name { font-weight: 600; font-size: .875rem; color: #1e293b; }
+        .recent-msg__date { font-size: .72rem; color: #94a3b8; }
+        .recent-msg__subject {
+            font-size: .8rem; color: #64748b;
+            display: flex; align-items: center;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+    </style>
+</body>
+</html>

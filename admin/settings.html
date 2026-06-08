@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Settings - Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <aside class="admin-sidebar"></aside>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <div>
+                <h1><i class="fas fa-cog"></i> Website Settings</h1>
+                <p style="margin:0;color:#64748b;font-size:.875rem;">Konfigurasi tampilan dan branding website</p>
+            </div>
+            <a href="../index.html" target="_blank" class="btn btn-secondary btn-sm">
+                <i class="fas fa-eye"></i> Lihat Website
+            </a>
+        </header>
+
+        <div class="admin-content">
+            <div style="display:grid;grid-template-columns:1fr 380px;gap:1.5rem;align-items:start;">
+
+                <!-- LEFT: Form -->
+                <div>
+                    <form id="settingsForm" onsubmit="handleSettingsSubmit(event)">
+
+                        <!-- Site Info -->
+                        <div class="content-card" style="margin-bottom:1.25rem;">
+                            <h3><i class="fas fa-globe" style="color:#3b82f6;margin-right:.5rem;"></i> Informasi Website</h3>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label for="siteName">Nama Website *</label>
+                                <input type="text" id="siteName" class="form-control" required
+                                       placeholder="PT TechNova Indonesia" oninput="updateSettingsPreview()">
+                            </div>
+                        </div>
+
+                        <!-- Branding -->
+                        <div class="content-card" style="margin-bottom:1.25rem;">
+                            <h3><i class="fas fa-palette" style="color:#8b5cf6;margin-right:.5rem;"></i> Branding &amp; Logo</h3>
+                            <div class="form-group">
+                                <label>Logo Website</label>
+                                <p style="font-size:.8rem;color:#64748b;margin-bottom:.75rem;">
+                                    Ditampilkan di navbar semua halaman
+                                </p>
+                                <div id="logoUploader"></div>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Favicon</label>
+                                <p style="font-size:.8rem;color:#64748b;margin-bottom:.75rem;">
+                                    Icon kecil di tab browser (format ICO/PNG, ukuran 32x32)
+                                </p>
+                                <div id="faviconUploader"></div>
+                            </div>
+                        </div>
+
+                        <!-- Color -->
+                        <div class="content-card" style="margin-bottom:1.25rem;">
+                            <h3><i class="fas fa-fill-drip" style="color:#f59e0b;margin-right:.5rem;"></i> Warna Utama</h3>
+                            <p style="font-size:.8rem;color:#64748b;margin-bottom:1rem;">
+                                Warna ini akan diterapkan ke seluruh tombol, link, dan elemen utama website
+                            </p>
+                            <div style="display:flex;gap:1rem;align-items:center;">
+                                <div>
+                                    <label style="display:block;font-size:.8rem;color:#374151;margin-bottom:.4rem;">Color Picker</label>
+                                    <input type="color" id="primaryColor" value="#2563eb"
+                                           style="width:60px;height:48px;border:1px solid #e2e8f0;border-radius:.5rem;cursor:pointer;padding:2px;"
+                                           oninput="syncColor('picker')">
+                                </div>
+                                <div style="flex:1;">
+                                    <label style="display:block;font-size:.8rem;color:#374151;margin-bottom:.4rem;">Hex Code</label>
+                                    <input type="text" id="primaryColorHex" class="form-control"
+                                           placeholder="#2563eb" pattern="^#[0-9A-Fa-f]{6}$"
+                                           oninput="syncColor('hex')">
+                                </div>
+                            </div>
+                            <!-- Quick color presets -->
+                            <div style="margin-top:1rem;">
+                                <p style="font-size:.75rem;color:#94a3b8;margin-bottom:.5rem;">Preset warna:</p>
+                                <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                                    <button type="button" onclick="setColor('#2563eb')" title="Blue" style="width:28px;height:28px;border-radius:50%;background:#2563eb;border:2px solid transparent;cursor:pointer;"></button>
+                                    <button type="button" onclick="setColor('#7c3aed')" title="Purple" style="width:28px;height:28px;border-radius:50%;background:#7c3aed;border:2px solid transparent;cursor:pointer;"></button>
+                                    <button type="button" onclick="setColor('#db2777')" title="Pink" style="width:28px;height:28px;border-radius:50%;background:#db2777;border:2px solid transparent;cursor:pointer;"></button>
+                                    <button type="button" onclick="setColor('#059669')" title="Green" style="width:28px;height:28px;border-radius:50%;background:#059669;border:2px solid transparent;cursor:pointer;"></button>
+                                    <button type="button" onclick="setColor('#dc2626')" title="Red" style="width:28px;height:28px;border-radius:50%;background:#dc2626;border:2px solid transparent;cursor:pointer;"></button>
+                                    <button type="button" onclick="setColor('#d97706')" title="Orange" style="width:28px;height:28px;border-radius:50%;background:#d97706;border:2px solid transparent;cursor:pointer;"></button>
+                                    <button type="button" onclick="setColor('#0891b2')" title="Cyan" style="width:28px;height:28px;border-radius:50%;background:#0891b2;border:2px solid transparent;cursor:pointer;"></button>
+                                    <button type="button" onclick="setColor('#1e293b')" title="Dark" style="width:28px;height:28px;border-radius:50%;background:#1e293b;border:2px solid transparent;cursor:pointer;"></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Background Images per Page -->
+                        <div class="content-card" style="margin-bottom:1.25rem;">
+                            <h3><i class="fas fa-image" style="color:#06b6d4;margin-right:.5rem;"></i> Background Foto Setiap Halaman</h3>
+                            <p style="font-size:.8rem;color:#64748b;margin-bottom:1.25rem;">
+                                Upload foto yang akan menjadi background hero section di setiap halaman. Foto akan ditampilkan full-width dengan overlay gelap.
+                            </p>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+                                <div>
+                                    <label style="display:block;font-weight:600;color:#374151;margin-bottom:.5rem;">
+                                        <i class="fas fa-info-circle" style="color:#3b82f6;margin-right:.25rem;"></i> Halaman About
+                                    </label>
+                                    <div id="aboutBgUploader"></div>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-weight:600;color:#374151;margin-bottom:.5rem;">
+                                        <i class="fas fa-briefcase" style="color:#8b5cf6;margin-right:.25rem;"></i> Halaman Services
+                                    </label>
+                                    <div id="servicesBgUploader"></div>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-weight:600;color:#374151;margin-bottom:.5rem;">
+                                        <i class="fas fa-users" style="color:#22c55e;margin-right:.25rem;"></i> Halaman Team
+                                    </label>
+                                    <div id="teamBgUploader"></div>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-weight:600;color:#374151;margin-bottom:.5rem;">
+                                        <i class="fas fa-envelope" style="color:#f59e0b;margin-right:.25rem;"></i> Halaman Contact
+                                    </label>
+                                    <div id="contactBgUploader"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="content-card" style="margin-bottom:1.25rem;">
+                            <h3><i class="fas fa-align-left" style="color:#10b981;margin-right:.5rem;"></i> Footer Text</h3>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label for="footerText">Teks Footer *</label>
+                                <textarea id="footerText" class="form-control" rows="2" required
+                                          placeholder="© 2024 PT TechNova Indonesia. All rights reserved."
+                                          oninput="updateSettingsPreview()"></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width:100%;padding:1rem;font-size:1rem;">
+                            <i class="fas fa-save"></i> Simpan Settings
+                        </button>
+                    </form>
+                </div>
+
+                <!-- RIGHT: Live Preview -->
+                <div style="position:sticky;top:80px;">
+                    <div class="content-card" style="padding:0;overflow:hidden;margin-bottom:1.25rem;">
+                        <div style="padding:.875rem 1.25rem;background:#1e293b;display:flex;align-items:center;gap:.75rem;">
+                            <div style="display:flex;gap:5px;">
+                                <span style="width:12px;height:12px;border-radius:50%;background:#ef4444;display:block;"></span>
+                                <span style="width:12px;height:12px;border-radius:50%;background:#f59e0b;display:block;"></span>
+                                <span style="width:12px;height:12px;border-radius:50%;background:#22c55e;display:block;"></span>
+                            </div>
+                            <span style="color:#94a3b8;font-size:.75rem;flex:1;text-align:center;">Live Preview</span>
+                        </div>
+                        <div style="padding:1.25rem;">
+                            <!-- Navbar preview -->
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:.625rem .875rem;border-radius:.375rem;border:1px solid #e2e8f0;margin-bottom:1rem;">
+                                <div style="display:flex;align-items:center;gap:.5rem;">
+                                    <img id="prev_logo" src="" alt="" style="height:24px;display:none;border-radius:3px;">
+                                    <span id="prev_siteName" style="font-weight:700;font-size:.8rem;color:#0f172a;">TechNova</span>
+                                </div>
+                                <div id="prev_navBtn" style="background:#2563eb;color:white;font-size:.55rem;padding:.25rem .6rem;border-radius:3px;font-weight:600;">Get Started</div>
+                            </div>
+
+                            <!-- Color swatch -->
+                            <div style="margin-bottom:1rem;">
+                                <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem;text-transform:uppercase;font-weight:600;">Warna Utama</p>
+                                <div style="display:flex;gap:.5rem;align-items:center;">
+                                    <div id="prev_colorSwatch" style="width:40px;height:40px;border-radius:.375rem;background:#2563eb;border:1px solid rgba(0,0,0,.1);"></div>
+                                    <div>
+                                        <p id="prev_colorHex" style="font-size:.8rem;font-weight:600;color:#1e293b;margin:0;">#2563eb</p>
+                                        <p style="font-size:.7rem;color:#94a3b8;margin:0;">Warna primer</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sample buttons -->
+                            <div style="margin-bottom:1rem;">
+                                <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem;text-transform:uppercase;font-weight:600;">Contoh Elemen</p>
+                                <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                                    <span id="prev_btn1" style="background:#2563eb;color:white;font-size:.65rem;padding:.35rem .7rem;border-radius:.375rem;font-weight:600;">Button</span>
+                                    <span id="prev_btn2" style="background:white;color:#2563eb;border:1.5px solid #2563eb;font-size:.65rem;padding:.35rem .7rem;border-radius:.375rem;font-weight:600;">Outline</span>
+                                    <span id="prev_link" style="color:#2563eb;font-size:.65rem;font-weight:600;text-decoration:underline;">Link →</span>
+                                </div>
+                            </div>
+
+                            <!-- Footer preview -->
+                            <div style="background:#0f172a;border-radius:.375rem;padding:.625rem .875rem;">
+                                <p style="font-size:.6rem;color:#94a3b8;margin:0;" id="prev_footer">Footer text will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tips card -->
+                    <div class="content-card" style="background:#fffbeb;border-color:#fde68a;">
+                        <h3 style="color:#92400e;margin-bottom:.75rem;">
+                            <i class="fas fa-lightbulb" style="color:#f59e0b;margin-right:.5rem;"></i> Tips
+                        </h3>
+                        <ul style="margin:0;padding-left:1.25rem;font-size:.8rem;color:#78350f;line-height:1.8;">
+                            <li>Logo idealnya format PNG transparan</li>
+                            <li>Ukuran logo yang baik: 200x60px</li>
+                            <li>Warna primer mempengaruhi seluruh website</li>
+                            <li>Favicon ukuran 32x32px atau 64x64px</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin-sidebar.js"></script>
+    <script src="../js/image-uploader.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', async function() {
+            const isAdmin = await protectAdminPage();
+            if (!isAdmin) return;
+
+            createImageUploader({ containerId:'logoUploader',       inputId:'logoUrl',       label:'Logo Website' });
+            createImageUploader({ containerId:'faviconUploader',    inputId:'faviconUrl',    label:'Favicon' });
+            createImageUploader({ containerId:'aboutBgUploader',    inputId:'aboutBgUrl',    label:'Background About' });
+            createImageUploader({ containerId:'servicesBgUploader', inputId:'servicesBgUrl', label:'Background Services' });
+            createImageUploader({ containerId:'teamBgUploader',     inputId:'teamBgUrl',     label:'Background Team' });
+            createImageUploader({ containerId:'contactBgUploader',  inputId:'contactBgUrl',  label:'Background Contact' });
+
+            await loadSettings();
+        });
+
+        async function loadSettings() {
+            try {
+                showLoading();
+                const { data: settings, error } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .single();
+                
+                if (error) throw error;
+                if (settings && Object.keys(settings).length > 0) {
+                    document.getElementById('siteName').value    = settings.site_name || '';
+                    document.getElementById('footerText').value  = settings.footer_text || '';
+                    const color = settings.primary_color || '#2563eb';
+                    document.getElementById('primaryColor').value    = color;
+                    document.getElementById('primaryColorHex').value = color;
+                    applyColorToPreview(color);
+
+                    const reinit = (cId, iId, label, url) => {
+                        if (url) createImageUploader({ containerId:cId, inputId:iId, label, currentUrl:url });
+                    };
+                    reinit('logoUploader',       'logoUrl',       'Logo Website',        settings.logo_url);
+                    reinit('faviconUploader',    'faviconUrl',    'Favicon',             settings.favicon_url);
+                    reinit('aboutBgUploader',    'aboutBgUrl',    'Background About',    settings.about_bg_url);
+                    reinit('servicesBgUploader', 'servicesBgUrl', 'Background Services', settings.services_bg_url);
+                    reinit('teamBgUploader',     'teamBgUrl',     'Background Team',     settings.team_bg_url);
+                    reinit('contactBgUploader',  'contactBgUrl',  'Background Contact',  settings.contact_bg_url);
+
+                    if (settings.logo_url) {
+                        document.getElementById('prev_logo').src = settings.logo_url;
+                        document.getElementById('prev_logo').style.display = 'block';
+                    }
+                    updateSettingsPreview();
+                }
+                hideLoading();
+            } catch(e) {
+                hideLoading();
+                showToast('Gagal memuat settings: ' + e.message, 'error');
+            }
+        }
+
+        function syncColor(source) {
+            if (source === 'picker') {
+                const color = document.getElementById('primaryColor').value;
+                document.getElementById('primaryColorHex').value = color;
+                applyColorToPreview(color);
+            } else {
+                const hex = document.getElementById('primaryColorHex').value;
+                if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+                    document.getElementById('primaryColor').value = hex;
+                    applyColorToPreview(hex);
+                }
+            }
+        }
+
+        function setColor(color) {
+            document.getElementById('primaryColor').value    = color;
+            document.getElementById('primaryColorHex').value = color;
+            applyColorToPreview(color);
+        }
+
+        function applyColorToPreview(color) {
+            document.getElementById('prev_colorSwatch').style.background = color;
+            document.getElementById('prev_colorHex').textContent          = color;
+            document.getElementById('prev_navBtn').style.background       = color;
+            document.getElementById('prev_btn1').style.background         = color;
+            document.getElementById('prev_btn2').style.color              = color;
+            document.getElementById('prev_btn2').style.borderColor        = color;
+            document.getElementById('prev_link').style.color              = color;
+        }
+
+        function updateSettingsPreview() {
+            const name = document.getElementById('siteName')?.value || '';
+            const footer = document.getElementById('footerText')?.value || '';
+            document.getElementById('prev_siteName').textContent = name;
+            document.getElementById('prev_footer').textContent   = footer;
+
+            const logoUrl = document.getElementById('logoUrl')?.value;
+            if (logoUrl) {
+                const img = document.getElementById('prev_logo');
+                img.src = logoUrl;
+                img.style.display = 'block';
+            }
+        }
+
+        // Watch logoUrl changes from uploader
+        document.addEventListener('change', e => {
+            if (e.target?.id === 'logoUrl') {
+                const img = document.getElementById('prev_logo');
+                img.src = e.target.value;
+                img.style.display = e.target.value ? 'block' : 'none';
+            }
+        });
+
+        async function handleSettingsSubmit(e) {
+            e.preventDefault();
+            const g = id => document.getElementById(id)?.value || null;
+            const formData = {
+                site_name:       document.getElementById('siteName').value,
+                logo_url:        g('logoUrl'),
+                favicon_url:     g('faviconUrl'),
+                primary_color:   document.getElementById('primaryColorHex').value,
+                footer_text:     document.getElementById('footerText').value,
+                about_bg_url:    g('aboutBgUrl'),
+                services_bg_url: g('servicesBgUrl'),
+                team_bg_url:     g('teamBgUrl'),
+                contact_bg_url:  g('contactBgUrl'),
+            };
+            try {
+                showLoading();
+                const { error } = await supabaseClient
+                    .from('settings')
+                    .update(formData)
+                    .eq('id', 1); // Assuming single row with id=1
+                
+                if (error) throw error;
+                showToast('Settings berhasil disimpan!', 'success');
+                document.documentElement.style.setProperty('--primary', formData.primary_color);
+                hideLoading();
+            } catch(e) {
+                hideLoading();
+                showToast('Gagal: ' + e.message, 'error');
+            }
+        }
+    </script>
+
+    <style>
+        .content-card { background:white; border-radius:.75rem; padding:1.75rem; border:1px solid #e2e8f0; }
+        .content-card h3 { margin:0 0 1.25rem; font-size:1rem; color:#1e293b; }
+        @media (max-width:900px) {
+            .admin-content > div { grid-template-columns:1fr !important; }
+        }
+    </style>
+</body>
+</html>

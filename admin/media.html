@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Manager - Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>PT TechNova</h2>
+            <p>Admin Panel</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="home.html"><i class="fas fa-laptop"></i> Kelola Home</a>
+            <a href="about.html"><i class="fas fa-info-circle"></i> Kelola About</a>
+            <a href="services.html"><i class="fas fa-briefcase"></i> Kelola Services</a>
+            <a href="team.html"><i class="fas fa-users"></i> Kelola Team</a>
+            <a href="contact.html"><i class="fas fa-envelope"></i> Kelola Contact</a>
+            <a href="media.html" class="active"><i class="fas fa-images"></i> Media Manager</a>
+            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1><i class="fas fa-images"></i> Media Manager</h1>
+            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-upload"></i> Upload File
+            </button>
+        </header>
+
+        <div class="admin-content">
+            <!-- Upload Area -->
+            <div class="upload-area-wrapper">
+                <div id="mediaDropZone" class="media-dropzone">
+                    <input type="file" id="mediaFileInput" multiple accept="image/*" style="display:none">
+                    <div class="media-dropzone__inner">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Drag &amp; Drop Gambar ke Sini</h3>
+                        <p>atau</p>
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('mediaFileInput').click()">
+                            <i class="fas fa-folder-open"></i> Pilih Gambar
+                        </button>
+                        <p class="hint">JPG, PNG, GIF, WEBP, SVG · Maks 10 MB per file</p>
+                    </div>
+                    <div class="media-dropzone__overlay" id="mediaOverlay">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Lepaskan untuk upload!</p>
+                    </div>
+                </div>
+
+                <!-- Progress list -->
+                <div id="uploadProgressList"></div>
+            </div>
+
+            <!-- Files Grid -->
+            <div class="files-header">
+                <h3>Gambar Tersimpan</h3>
+                <span id="fileCount" style="color:#64748b;font-size:.875rem"></span>
+            </div>
+            <div id="filesList" class="media-grid"></div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin-sidebar.js"></script>
+    <script src="../js/image-uploader.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', async function() {
+            const isAdmin = await protectAdminPage();
+            if (isAdmin) {
+                setupDrop();
+                await loadFiles();
+            }
+        });
+
+        // ---- Drag & drop setup ----
+        function setupDrop() {
+            const zone  = document.getElementById('mediaDropZone');
+            const input = document.getElementById('mediaFileInput');
+            const overlay = document.getElementById('mediaOverlay');
+
+            zone.addEventListener('dragenter', e => { e.preventDefault(); overlay.style.display = 'flex'; });
+            zone.addEventListener('dragover',  e => { e.preventDefault(); overlay.style.display = 'flex'; });
+            zone.addEventListener('dragleave', e => {
+                if (!zone.contains(e.relatedTarget)) overlay.style.display = 'none';
+            });
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                overlay.style.display = 'none';
+                uploadFiles([...e.dataTransfer.files]);
+            });
+
+            input.addEventListener('change', e => uploadFiles([...e.target.files]));
+        }
+
+        // ---- Upload multiple files ----
+        async function uploadFiles(files) {
+            if (!files.length) return;
+            for (const file of files) await uploadSingle(file);
+            await loadFiles();
+        }
+
+        async function uploadSingle(file) {
+            const list = document.getElementById('uploadProgressList');
+
+            const item = document.createElement('div');
+            item.className = 'upload-item';
+            item.innerHTML = `
+                <span class="upload-item__name">${file.name}</span>
+                <div class="upload-item__bar"><div class="upload-item__fill" style="width:0%"></div></div>
+                <span class="upload-item__status">Mengupload…</span>`;
+            list.prepend(item);
+
+            const fill   = item.querySelector('.upload-item__fill');
+            const status = item.querySelector('.upload-item__status');
+
+            try {
+                // Simulate progress at 30%
+                fill.style.width = '30%';
+
+                const result = await uploadToSupabase(file, 'media');
+                
+                if (!result.success) throw new Error(result.error || 'Upload gagal');
+
+                fill.style.width = '100%';
+                status.textContent = '✓ Selesai';
+                status.style.color = '#22c55e';
+                showToast(`${file.name} berhasil diupload!`, 'success');
+
+            } catch(e) {
+                fill.style.width = '100%';
+                fill.style.background = '#ef4444';
+                status.textContent = '✗ ' + e.message;
+                status.style.color = '#ef4444';
+                showToast('Gagal upload: ' + e.message, 'error');
+            }
+
+            // Auto-remove progress item after 3s
+            setTimeout(() => item.remove(), 3000);
+        }
+
+        // ---- Load files from Supabase Storage ----
+        async function loadFiles() {
+            try {
+                showLoading();
+                const { data, error } = await supabaseClient.storage
+                    .from('media')
+                    .list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+                
+                if (error) throw error;
+                
+                // Get public URLs for all files
+                const files = data.map(file => {
+                    const { data: { publicUrl } } = supabaseClient.storage
+                        .from('media')
+                        .getPublicUrl(file.name);
+                    return {
+                        filename: file.name,
+                        url: publicUrl,
+                        size: file.metadata?.size || 0,
+                        created_at: file.created_at
+                    };
+                });
+                
+                renderFiles(files);
+                hideLoading();
+            } catch(e) {
+                hideLoading();
+                document.getElementById('filesList').innerHTML =
+                    `<p style="color:#ef4444">Gagal memuat file: ${e.message}</p>`;
+            }
+        }
+
+        function renderFiles(files) {
+            const container = document.getElementById('filesList');
+            document.getElementById('fileCount').textContent =
+                files.length ? `${files.length} gambar` : '';
+
+            if (!files.length) {
+                container.innerHTML = `
+                    <div class="media-empty">
+                        <i class="fas fa-images"></i>
+                        <p>Belum ada gambar yang diupload</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = files.map(f => `
+                <div class="media-card" data-filename="${f.filename}">
+                    <div class="media-card__img">
+                        <img src="${f.url}" alt="${f.filename}"
+                             onerror="this.parentElement.innerHTML='<i class=\'fas fa-image\'></i>'">
+                    </div>
+                    <div class="media-card__info">
+                        <p class="media-card__name" title="${f.filename}">${truncate(f.filename, 22)}</p>
+                        <p class="media-card__size">${fmtSize(f.size)}</p>
+                    </div>
+                    <div class="media-card__actions">
+                        <button class="btn btn-sm btn-primary" onclick="copyURL('${f.url}')" title="Salin URL">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="window.open('${f.url}','_blank')" title="Lihat">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteFile('${f.filename}')" title="Hapus">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function copyURL(url) {
+            try {
+                await navigator.clipboard.writeText(url);
+            } catch {
+                const t = document.createElement('textarea');
+                t.value = url; document.body.appendChild(t); t.select();
+                document.execCommand('copy'); document.body.removeChild(t);
+            }
+            showToast('URL disalin!', 'success');
+        }
+
+        async function deleteFile(filename) {
+            if (!confirm(`Hapus file "${filename}"?`)) return;
+            try {
+                showLoading();
+                const result = await deleteFromSupabase('media', filename);
+                
+                if (!result.success) throw new Error(result.error || 'Delete gagal');
+                
+                showToast('File dihapus!', 'success');
+                await loadFiles();
+                hideLoading();
+            } catch(e) {
+                hideLoading();
+                showToast('Gagal hapus: ' + e.message, 'error');
+            }
+        }
+
+        // Helpers
+        function truncate(str, n) { return str.length > n ? str.slice(0, n) + '…' : str; }
+        function fmtSize(bytes) {
+            if (!bytes) return '';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+            return (bytes/1048576).toFixed(1) + ' MB';
+        }
+    </script>
+
+    <style>
+        /* Drop zone */
+        .upload-area-wrapper { margin-bottom: 2rem; }
+
+        .media-dropzone {
+            position: relative;
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.75rem;
+            background: #f8fafc;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color .2s, background .2s;
+            cursor: pointer;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .media-dropzone:hover { border-color: #3b82f6; background: #eff6ff; }
+
+        .media-dropzone__inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .5rem;
+            color: #64748b;
+            text-align: center;
+            padding: 2rem;
+        }
+        .media-dropzone__inner i { font-size: 2.5rem; color: #94a3b8; }
+        .media-dropzone__inner h3 { margin: 0; color: #475569; }
+        .media-dropzone__inner p { margin: 0; }
+        .media-dropzone__inner .hint { font-size: .75rem; color: #94a3b8; }
+
+        .media-dropzone__overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(59,130,246,.88);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: .75rem;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: 10;
+            border-radius: .65rem;
+        }
+        .media-dropzone__overlay i { font-size: 2.5rem; }
+
+        /* Upload progress items */
+        .upload-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-rows: auto auto;
+            gap: .25rem .75rem;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: .5rem;
+            padding: .75rem 1rem;
+            margin-bottom: .5rem;
+            animation: fadeIn .2s ease;
+        }
+        .upload-item__name  { font-size: .875rem; font-weight: 500; color: #1e293b; }
+        .upload-item__status { font-size: .75rem; color: #64748b; text-align: right; }
+        .upload-item__bar   { grid-column: 1 / -1; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+        .upload-item__fill  { height: 100%; background: #3b82f6; transition: width .3s ease; border-radius: 3px; }
+
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+
+        /* Files grid */
+        .files-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .files-header h3 { margin: 0; }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .media-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: .75rem;
+            overflow: hidden;
+            transition: box-shadow .2s, transform .2s;
+        }
+        .media-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); transform: translateY(-2px); }
+
+        .media-card__img {
+            height: 140px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .media-card__img img { width: 100%; height: 100%; object-fit: cover; }
+        .media-card__img i { font-size: 2rem; color: #cbd5e1; }
+
+        .media-card__info { padding: .75rem 1rem .25rem; }
+        .media-card__name { font-size: .8rem; font-weight: 500; color: #1e293b; margin: 0 0 .2rem; }
+        .media-card__size { font-size: .72rem; color: #94a3b8; margin: 0; }
+
+        .media-card__actions { display: flex; gap: .5rem; padding: .75rem 1rem; border-top: 1px solid #f1f5f9; }
+
+        .media-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #94a3b8;
+        }
+        .media-empty i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    </style>
+</body>
+</html>

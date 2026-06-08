@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Home - Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <aside class="admin-sidebar"></aside>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1><i class="fas fa-laptop"></i> Kelola Home Page</h1>
+            <div style="display:flex;gap:.75rem;">
+                <a href="../index.html" target="_blank" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-eye"></i> Lihat Website
+                </a>
+                <button class="btn btn-primary btn-sm" onclick="document.getElementById('homeForm').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <div style="display:grid; grid-template-columns: 1fr 400px; gap:1.5rem; align-items:start;">
+
+                <!-- LEFT: Form -->
+                <div>
+                    <!-- Company Info -->
+                    <div class="content-card" style="margin-bottom:1.25rem;">
+                        <h3><i class="fas fa-building" style="color:#3b82f6;margin-right:.5rem;"></i> Info Perusahaan</h3>
+                        <form id="homeForm" onsubmit="handleHomeSubmit(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="companyName">Nama Perusahaan *</label>
+                                <input type="text" id="companyName" class="form-control" required
+                                       oninput="updatePreview()" placeholder="PT TechNova Indonesia">
+                            </div>
+                            <div class="form-group">
+                                <label for="tagline">Tagline *</label>
+                                <input type="text" id="tagline" class="form-control" required
+                                       oninput="updatePreview()" placeholder="Transforming Ideas Into Digital Solutions">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hero Section -->
+                    <div class="content-card" style="margin-bottom:1.25rem;">
+                        <h3><i class="fas fa-star" style="color:#f59e0b;margin-right:.5rem;"></i> Hero Section</h3>
+                        <div class="form-group">
+                            <label for="heroTitle">Hero Title *</label>
+                            <input type="text" id="heroTitle" class="form-control" required
+                                   oninput="updatePreview()" placeholder="Build Your Digital Future With Us">
+                        </div>
+                        <div class="form-group">
+                            <label for="heroSubtitle">Hero Subtitle *</label>
+                            <input type="text" id="heroSubtitle" class="form-control" required
+                                   oninput="updatePreview()" placeholder="Professional Software Development Company">
+                        </div>
+                        <div class="form-group">
+                            <label for="heroDescription">Deskripsi Hero *</label>
+                            <textarea id="heroDescription" class="form-control" rows="3" required
+                                      oninput="updatePreview()"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="ctaText">Teks Tombol CTA *</label>
+                            <input type="text" id="ctaText" class="form-control" required
+                                   oninput="updatePreview()" placeholder="Get Started Today">
+                        </div>
+                    </div>
+
+                    <!-- Images -->
+                    <div class="content-card" style="margin-bottom:1.25rem;">
+                        <h3><i class="fas fa-image" style="color:#8b5cf6;margin-right:.5rem;"></i> Gambar</h3>
+                        <div class="form-group">
+                            <label>Logo Perusahaan</label>
+                            <div id="logoUploader"></div>
+                        </div>
+                        <div class="form-group" style="margin-top:1.25rem;">
+                            <label>Background Hero (Full Screen)</label>
+                            <p style="font-size:.75rem;color:#6b6b80;margin-bottom:.75rem;">
+                                <i class="fas fa-info-circle" style="color:#635bff;"></i>
+                                Foto ini akan menjadi background <strong style="color:#a1a1b5;">full screen</strong> di hero page Home.
+                                Gunakan foto landscape minimal 1920×1080px untuk hasil terbaik.
+                            </p>
+                            <div id="heroImageUploader"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" form="homeForm" class="btn btn-primary" style="width:100%;padding:1rem;font-size:1rem;">
+                        <i class="fas fa-save"></i> Simpan Semua Perubahan
+                    </button>
+                        </form>
+                </div>
+
+                <!-- RIGHT: Live Preview -->
+                <div style="position:sticky; top:80px;">
+                    <div class="content-card" style="padding:0; overflow:hidden;">
+                        <div style="padding:.875rem 1.25rem; background:#1e293b; display:flex; align-items:center; gap:.75rem;">
+                            <div style="display:flex;gap:5px;">
+                                <span style="width:12px;height:12px;border-radius:50%;background:#ef4444;display:block;"></span>
+                                <span style="width:12px;height:12px;border-radius:50%;background:#f59e0b;display:block;"></span>
+                                <span style="width:12px;height:12px;border-radius:50%;background:#22c55e;display:block;"></span>
+                            </div>
+                            <span style="color:#94a3b8;font-size:.75rem;flex:1;text-align:center;">Live Preview</span>
+                        </div>
+
+                        <!-- Mini Hero Preview — Full Background -->
+                        <div id="livePreview" style="background:#0a0a0f; padding:0; position:relative; min-height:220px; overflow:hidden; border-radius:0;">
+                            <!-- BG image preview -->
+                            <div id="prev_bgOverlay" style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(10,10,15,.82) 0%,rgba(10,10,15,.55) 100%);z-index:1;"></div>
+
+                            <!-- Navbar mock -->
+                            <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;
+                                        padding:.75rem 1rem; border-bottom:1px solid rgba(255,255,255,.08);">
+                                <div style="display:flex;align-items:center;gap:.5rem;">
+                                    <img id="prev_logo" src="" alt="Logo" style="height:22px;display:none;border-radius:3px;">
+                                    <span id="prev_siteName" style="font-weight:700;font-size:.8rem;color:#f1f1f5;">TechNova</span>
+                                </div>
+                                <div style="display:flex;gap:.75rem;">
+                                    <span style="font-size:.6rem;color:#a1a1b5;">Home</span>
+                                    <span style="font-size:.6rem;color:#a1a1b5;">About</span>
+                                    <span style="font-size:.6rem;color:#a1a1b5;">Services</span>
+                                </div>
+                            </div>
+
+                            <!-- Hero text mock -->
+                            <div style="position:relative;z-index:2; padding:1.25rem 1rem 1.5rem;">
+                                <p id="prev_subtitle" style="font-size:.6rem;color:#a78bfa;font-weight:600;margin-bottom:.3rem;"></p>
+                                <h4 id="prev_title" style="font-size:.875rem;font-weight:800;color:#fff;margin-bottom:.5rem;line-height:1.25;letter-spacing:-.02em;"></h4>
+                                <p id="prev_desc" style="font-size:.6rem;color:rgba(255,255,255,.6);margin-bottom:.875rem;line-height:1.5;"></p>
+                                <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                                    <span id="prev_cta" style="background:#635bff;color:white;font-size:.6rem;padding:.3rem .7rem;border-radius:.375rem;display:inline-block;font-weight:600;"></span>
+                                    <span style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:.6rem;padding:.3rem .7rem;border-radius:.375rem;display:inline-block;font-weight:500;border:1px solid rgba(255,255,255,.15);">Learn More</span>
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:center;">
+                                <div>
+                                    <p id="prev_subtitle" style="font-size:.6rem;color:#3b82f6;font-weight:600;margin-bottom:.3rem;"></p>
+                                    <h4 id="prev_title" style="font-size:.875rem;font-weight:800;color:#0f172a;margin-bottom:.5rem;line-height:1.3;"></h4>
+                                    <p id="prev_desc" style="font-size:.6rem;color:#64748b;margin-bottom:.75rem;line-height:1.5;"></p>
+                                    <span id="prev_cta" style="background:#3b82f6;color:white;font-size:.6rem;padding:.3rem .7rem;border-radius:4px;display:inline-block;font-weight:600;"></span>
+                                </div>
+                                <div>
+                                    <img id="prev_heroImg" src="" alt=""
+                                         style="width:100%;height:90px;object-fit:cover;border-radius:8px;display:none;box-shadow:0 4px 12px rgba(0,0,0,.15);">
+                                    <div id="prev_heroPlaceholder" style="width:100%;height:90px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                                        <i class="fas fa-image" style="color:#93c5fd;font-size:1.5rem;"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preview label -->
+                            <div style="margin-top:1rem;padding-top:.75rem;border-top:1px solid #e2e8f0;text-align:center;">
+                                <a href="../public/index.html" target="_blank"
+                                   style="font-size:.7rem;color:#3b82f6;font-weight:500;">
+                                    <i class="fas fa-external-link-alt"></i> Buka tampilan penuh
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Mobile preview hint -->
+                        <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:.75rem 1.25rem;display:flex;align-items:center;gap:.5rem;">
+                            <i class="fas fa-mobile-alt" style="color:#64748b;font-size:.875rem;"></i>
+                            <span style="font-size:.75rem;color:#64748b;">Responsif di semua perangkat</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin-sidebar.js"></script>
+    <script src="../js/admin-main.js"></script>
+    <script src="../js/image-uploader.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', async function() {
+            const isAdmin = await protectAdminPage();
+            if (!isAdmin) return;
+
+            createImageUploader({
+                containerId: 'logoUploader',
+                inputId: 'logoUrl',
+                label: 'Logo Perusahaan',
+                onUpload: url => {
+                    const img = document.getElementById('prev_logo');
+                    img.src = url; img.style.display = 'block';
+                }
+            });
+            createImageUploader({
+                containerId: 'heroImageUploader',
+                inputId: 'heroImageUrl',
+                label: 'Hero Image',
+                onUpload: url => {
+                    document.getElementById('prev_heroImg').src = url;
+                    document.getElementById('prev_heroImg').style.display = 'block';
+                    document.getElementById('prev_heroPlaceholder').style.display = 'none';
+                }
+            });
+
+            await loadHomeContentForm();
+        });
+
+        async function loadHomeContentForm() {
+            try {
+                showLoading();
+                const content = await apiCall(API.home, { method: 'GET' });
+                if (content && Object.keys(content).length > 0) {
+                    document.getElementById('companyName').value     = content.company_name || '';
+                    document.getElementById('tagline').value         = content.tagline || '';
+                    document.getElementById('heroTitle').value       = content.hero_title || '';
+                    document.getElementById('heroSubtitle').value    = content.hero_subtitle || '';
+                    document.getElementById('heroDescription').value = content.hero_description || '';
+                    document.getElementById('ctaText').value         = content.cta_text || '';
+
+                    if (content.logo_url) {
+                        createImageUploader({ containerId:'logoUploader', inputId:'logoUrl', label:'Logo Perusahaan', currentUrl: content.logo_url });
+                        const img = document.getElementById('prev_logo');
+                        img.src = content.logo_url; img.style.display = 'block';
+                    }
+                    if (content.hero_image_url) {
+                        createImageUploader({ containerId:'heroImageUploader', inputId:'heroImageUrl', label:'Hero Image', currentUrl: content.hero_image_url });
+                        document.getElementById('prev_heroImg').src = content.hero_image_url;
+                        document.getElementById('prev_heroImg').style.display = 'block';
+                        document.getElementById('prev_heroPlaceholder').style.display = 'none';
+                    }
+                    updatePreview();
+                }
+                hideLoading();
+            } catch(e) {
+                hideLoading();
+                showToast('Gagal memuat: ' + e.message, 'error');
+            }
+        }
+
+        function updatePreview() {
+            document.getElementById('prev_siteName').textContent  = document.getElementById('companyName')?.value || 'TechNova';
+            document.getElementById('prev_title').textContent     = document.getElementById('heroTitle')?.value || '';
+            document.getElementById('prev_subtitle').textContent  = document.getElementById('heroSubtitle')?.value || '';
+            document.getElementById('prev_desc').textContent      = document.getElementById('heroDescription')?.value || '';
+            document.getElementById('prev_cta').textContent       = document.getElementById('ctaText')?.value || 'Get Started';
+
+            const logoUrl = document.getElementById('logoUrl')?.value;
+            if (logoUrl) {
+                const img = document.getElementById('prev_logo');
+                img.src = logoUrl; img.style.display = 'block';
+            }
+            const heroUrl = document.getElementById('heroImageUrl')?.value;
+            if (heroUrl) {
+                document.getElementById('prev_heroImg').src = heroUrl;
+                document.getElementById('prev_heroImg').style.display = 'block';
+                document.getElementById('prev_heroPlaceholder').style.display = 'none';
+            }
+        }
+
+        async function handleHomeSubmit(e) {
+            e.preventDefault();
+            const formData = {
+                company_name:     document.getElementById('companyName').value,
+                tagline:          document.getElementById('tagline').value,
+                hero_title:       document.getElementById('heroTitle').value,
+                hero_subtitle:    document.getElementById('heroSubtitle').value,
+                hero_description: document.getElementById('heroDescription').value,
+                cta_text:         document.getElementById('ctaText').value,
+                logo_url:         document.getElementById('logoUrl')?.value || null,
+                hero_image_url:   document.getElementById('heroImageUrl')?.value || null,
+            };
+            await saveHomeContent(formData);
+        }
+
+        // Also update preview when image uploader changes URL input
+        document.addEventListener('change', e => {
+            if (e.target && (e.target.id === 'logoUrl' || e.target.id === 'heroImageUrl')) {
+                updatePreview();
+            }
+        });
+    </script>
+
+    <style>
+        .content-card { background: white; border-radius: .75rem; padding: 1.75rem; border: 1px solid #e2e8f0; }
+        .content-card h3 { margin: 0 0 1.25rem; font-size: 1rem; color: #1e293b; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        @media (max-width: 900px) {
+            .admin-content > div { grid-template-columns: 1fr !important; }
+            .form-row { grid-template-columns: 1fr !important; }
+        }
+    </style>
+</body>
+</html>

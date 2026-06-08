@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Pesan - Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>PT TechNova</h2>
+            <p>Admin Panel</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="home.html"><i class="fas fa-laptop"></i> Kelola Home</a>
+            <a href="about.html"><i class="fas fa-info-circle"></i> Kelola About</a>
+            <a href="services.html"><i class="fas fa-briefcase"></i> Kelola Services</a>
+            <a href="team.html"><i class="fas fa-users"></i> Kelola Team</a>
+            <a href="contact.html"><i class="fas fa-envelope"></i> Kelola Contact</a>
+            <a href="messages.html" class="active">
+                <i class="fas fa-inbox"></i> Pesan Masuk
+                <span id="unreadBadge" class="badge" style="display:none"></span>
+            </a>
+            <a href="media.html"><i class="fas fa-images"></i> Media Manager</a>
+            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <div>
+                <h1><i class="fas fa-inbox"></i> Pesan Masuk</h1>
+                <p id="msgStats" style="margin:0; color:#64748b; font-size:.875rem;"></p>
+            </div>
+            <div style="display:flex; gap:.75rem;">
+                <button class="btn btn-secondary" onclick="markAllRead()">
+                    <i class="fas fa-check-double"></i> Tandai Semua Dibaca
+                </button>
+                <button class="btn btn-danger" onclick="deleteAllRead()">
+                    <i class="fas fa-trash"></i> Hapus Yang Sudah Dibaca
+                </button>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <!-- Filter Tabs -->
+            <div class="msg-tabs">
+                <button class="msg-tab active" onclick="filterMessages('all', this)">
+                    <i class="fas fa-inbox"></i> Semua
+                    <span id="countAll" class="tab-count">0</span>
+                </button>
+                <button class="msg-tab" onclick="filterMessages('unread', this)">
+                    <i class="fas fa-envelope"></i> Belum Dibaca
+                    <span id="countUnread" class="tab-count unread">0</span>
+                </button>
+                <button class="msg-tab" onclick="filterMessages('read', this)">
+                    <i class="fas fa-envelope-open"></i> Sudah Dibaca
+                    <span id="countRead" class="tab-count">0</span>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="msg-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari nama, email, atau subjek…"
+                       oninput="filterBySearch(this.value)">
+            </div>
+
+            <!-- Messages List -->
+            <div id="messagesList"></div>
+        </div>
+    </main>
+
+    <!-- Detail Modal -->
+    <div id="msgModal" class="modal">
+        <div class="modal-content" style="max-width:700px;">
+            <div class="modal-header">
+                <h2 id="modalSubject" style="font-size:1.25rem;"></h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div style="padding:1.5rem;">
+                <!-- Sender Info -->
+                <div class="msg-detail-meta">
+                    <div class="msg-avatar" id="modalAvatar"></div>
+                    <div>
+                        <p style="margin:0; font-weight:600; color:#1e293b;" id="modalName"></p>
+                        <a id="modalEmail" href="#" style="color:#3b82f6; font-size:.875rem;"></a>
+                    </div>
+                    <div style="margin-left:auto; color:#64748b; font-size:.8rem;" id="modalDate"></div>
+                </div>
+
+                <!-- Message Body -->
+                <div class="msg-body" id="modalMessage"></div>
+
+                <!-- Reply Button -->
+                <div style="margin-top:1.5rem; display:flex; gap:.75rem; flex-wrap:wrap;">
+                    <a id="replyBtn" href="#" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-reply"></i> Balas via Email
+                    </a>
+                    <a id="whatsappBtn" href="#" class="btn btn-success" target="_blank" style="display:none;">
+                        <i class="fab fa-whatsapp"></i> Balas via WhatsApp
+                    </a>
+                    <button id="deleteModalBtn" class="btn btn-danger" onclick="deleteFromModal()">
+                        <i class="fas fa-trash"></i> Hapus Pesan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin-sidebar.js"></script>
+    <script>
+        let allMessages   = [];
+        let currentFilter = 'all';
+        let currentMsgId  = null;
+
+        // ---- Init ----
+        window.addEventListener('DOMContentLoaded', async function() {
+            const isAdmin = await protectAdminPage();
+            if (isAdmin) await loadMessages();
+        });
+
+        // ---- Load messages ----
+        async function loadMessages() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('contact_messages')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                allMessages = data;
+                updateCounts();
+                renderMessages(filterList(currentFilter));
+            } catch(e) {
+                showToast('Gagal memuat pesan: ' + e.message, 'error');
+            }
+        }
+
+        // ---- Counts ----
+        function updateCounts() {
+            const total   = allMessages.length;
+            const unread  = allMessages.filter(m => String(m.is_read) === '0').length;
+            const read    = total - unread;
+
+            document.getElementById('countAll').textContent    = total;
+            document.getElementById('countUnread').textContent = unread;
+            document.getElementById('countRead').textContent   = read;
+
+            // Header stats
+            document.getElementById('msgStats').textContent =
+                `${total} pesan · ${unread} belum dibaca`;
+
+            // Sidebar badge
+            const badge = document.getElementById('unreadBadge');
+            if (unread > 0) {
+                badge.textContent = unread;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // ---- Filter ----
+        function filterList(type, searchTerm = '') {
+            let list = [...allMessages];
+            if (type === 'unread') list = list.filter(m => !m.is_read);
+            if (type === 'read')   list = list.filter(m => m.is_read);
+            if (searchTerm) {
+                const q = searchTerm.toLowerCase();
+                list = list.filter(m =>
+                    m.name.toLowerCase().includes(q) ||
+                    m.email.toLowerCase().includes(q) ||
+                    m.subject.toLowerCase().includes(q) ||
+                    m.message.toLowerCase().includes(q)
+                );
+            }
+            return list;
+        }
+
+        function filterMessages(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('.msg-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            renderMessages(filterList(type, document.getElementById('searchInput').value));
+        }
+
+        function filterBySearch(val) {
+            renderMessages(filterList(currentFilter, val));
+        }
+
+        // ---- Render ----
+        function renderMessages(list) {
+            const container = document.getElementById('messagesList');
+
+            if (!list.length) {
+                container.innerHTML = `
+                    <div class="msg-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>Tidak ada pesan</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = list.map(msg => {
+                const isUnread = !msg.is_read;
+                const initials = msg.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+                const date     = formatDate(msg.created_at);
+                const preview  = msg.message.length > 100 ? msg.message.slice(0,100) + '…' : msg.message;
+
+                return `
+                <div class="msg-item ${isUnread ? 'msg-item--unread' : ''}"
+                     onclick="openMessage('${msg.id}')">
+
+                    <div class="msg-avatar" style="background:${strColor(msg.name)}">
+                        ${initials}
+                    </div>
+
+                    <div class="msg-item__body">
+                        <div class="msg-item__top">
+                            <span class="msg-item__name">${msg.name}</span>
+                            <span class="msg-item__date">${date}</span>
+                        </div>
+                        <div class="msg-item__subject">
+                            ${isUnread ? '<span class="dot"></span>' : ''}
+                            ${msg.subject}
+                        </div>
+                        <div class="msg-item__preview">${preview}</div>
+                        <div class="msg-item__email">
+                            <i class="fas fa-envelope" style="margin-right:4px; opacity:.6;"></i>${msg.email}
+                        </div>
+                    </div>
+
+                    <div class="msg-item__actions" onclick="event.stopPropagation()">
+                        ${isUnread
+                            ? `<button class="act-btn act-btn--blue" title="Tandai Dibaca"
+                                       onclick="markRead('${msg.id}')">
+                                   <i class="fas fa-check"></i>
+                               </button>`
+                            : ''
+                        }
+                        <button class="act-btn act-btn--red" title="Hapus"
+                                onclick="deleteMessage('${msg.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ---- Open message detail ----
+        async function openMessage(id) {
+            const msg = allMessages.find(m => m.id === id);
+            if (!msg) return;
+
+            currentMsgId = id;
+
+            // Fill modal
+            const initials = msg.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+            document.getElementById('modalAvatar').textContent = initials;
+            document.getElementById('modalAvatar').style.background = strColor(msg.name);
+            document.getElementById('modalSubject').textContent = msg.subject;
+            document.getElementById('modalName').textContent   = msg.name;
+            document.getElementById('modalEmail').textContent  = msg.email;
+            document.getElementById('modalEmail').href         = 'mailto:' + msg.email;
+            document.getElementById('modalDate').textContent   = formatDateLong(msg.created_at);
+            document.getElementById('modalMessage').textContent = msg.message;
+            document.getElementById('replyBtn').href =
+                `mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject)}`;
+
+            document.getElementById('msgModal').style.display = 'flex';
+
+            // Mark as read if unread
+            if (!msg.is_read) await markRead(id, false);
+        }
+
+        function closeModal() {
+            document.getElementById('msgModal').style.display = 'none';
+            currentMsgId = null;
+        }
+
+        async function deleteFromModal() {
+            if (currentMsgId) {
+                closeModal();
+                await deleteMessage(currentMsgId);
+            }
+        }
+
+        // ---- Actions ----
+        async function markRead(id, reload = true) {
+            try {
+                const { error } = await supabaseClient
+                    .from('contact_messages')
+                    .update({ is_read: true })
+                    .eq('id', id);
+                
+                if (error) throw error;
+                // Update local state
+                const m = allMessages.find(m => m.id === id);
+                if (m) m.is_read = true;
+                updateCounts();
+                if (reload) renderMessages(filterList(currentFilter, document.getElementById('searchInput').value));
+            } catch(e) {
+                showToast('Gagal: ' + e.message, 'error');
+            }
+        }
+
+        async function deleteMessage(id) {
+            if (!confirm('Hapus pesan ini?')) return;
+            try {
+                const { error } = await supabaseClient
+                    .from('contact_messages')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                allMessages = allMessages.filter(m => m.id !== id);
+                updateCounts();
+                renderMessages(filterList(currentFilter, document.getElementById('searchInput').value));
+                showToast('Pesan dihapus!', 'success');
+            } catch(e) {
+                showToast('Gagal hapus: ' + e.message, 'error');
+            }
+        }
+
+        async function markAllRead() {
+            const unread = allMessages.filter(m => !m.is_read);
+            if (!unread.length) return showToast('Semua pesan sudah dibaca.', 'info');
+            try {
+                const { error } = await supabaseClient
+                    .from('contact_messages')
+                    .update({ is_read: true })
+                    .in('id', unread.map(m => m.id));
+                
+                if (error) throw error;
+                for (const m of unread) m.is_read = true;
+                updateCounts();
+                renderMessages(filterList(currentFilter));
+                showToast('Semua pesan ditandai dibaca!', 'success');
+            } catch(e) {
+                showToast('Gagal: ' + e.message, 'error');
+            }
+        }
+
+        async function deleteAllRead() {
+            const read = allMessages.filter(m => String(m.is_read) === '1');
+            if (!read.length) return showToast('Tidak ada pesan yang sudah dibaca.', 'info');
+            if (!confirm(`Hapus ${read.length} pesan yang sudah dibaca?`)) return;
+            try {
+                for (const m of read) {
+                    await apiCall(`${API.contactMessages}?id=${m.id}`, { method: 'DELETE' });
+                }
+                allMessages = allMessages.filter(m => String(m.is_read) !== '1');
+                updateCounts();
+                renderMessages(filterList(currentFilter));
+                showToast(`${read.length} pesan dihapus!`, 'success');
+            } catch(e) {
+                showToast('Gagal: ' + e.message, 'error');
+            }
+        }
+
+        // ---- Helpers ----
+        function strColor(str) {
+            const colors = ['#3b82f6','#8b5cf6','#ec4899','#f59e0b','#10b981','#ef4444','#06b6d4','#f97316'];
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now - d;
+            const diffMin = Math.floor(diffMs / 60000);
+            const diffH   = Math.floor(diffMin / 60);
+            const diffD   = Math.floor(diffH / 24);
+
+            if (diffMin < 1)  return 'Baru saja';
+            if (diffMin < 60) return `${diffMin} menit lalu`;
+            if (diffH < 24)   return `${diffH} jam lalu`;
+            if (diffD < 7)    return `${diffD} hari lalu`;
+
+            return d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+        }
+
+        function formatDateLong(dateStr) {
+            if (!dateStr) return '';
+            return new Date(dateStr).toLocaleString('id-ID', {
+                weekday:'long', year:'numeric', month:'long',
+                day:'numeric', hour:'2-digit', minute:'2-digit'
+            });
+        }
+
+        // Close modal clicking outside
+        window.onclick = e => {
+            if (e.target === document.getElementById('msgModal')) closeModal();
+        };
+    </script>
+
+    <style>
+        /* ---- Tabs ---- */
+        .msg-tabs {
+            display: flex;
+            gap: .5rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+        .msg-tab {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .625rem 1.25rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 2rem;
+            background: white;
+            cursor: pointer;
+            font-size: .875rem;
+            font-weight: 500;
+            color: #475569;
+            transition: all .2s;
+        }
+        .msg-tab:hover   { border-color: #3b82f6; color: #3b82f6; }
+        .msg-tab.active  { background: #3b82f6; border-color: #3b82f6; color: white; }
+        .tab-count {
+            background: #e2e8f0;
+            color: #475569;
+            border-radius: 1rem;
+            padding: 1px 8px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+        .msg-tab.active .tab-count { background: rgba(255,255,255,.25); color: white; }
+        .tab-count.unread { background: #fef2f2; color: #ef4444; }
+
+        /* ---- Search ---- */
+        .msg-search {
+            position: relative;
+            margin-bottom: 1.25rem;
+        }
+        .msg-search i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+        .msg-search input {
+            width: 100%;
+            padding: .75rem 1rem .75rem 2.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: .5rem;
+            font-size: .875rem;
+            background: white;
+        }
+        .msg-search input:focus { outline: none; border-color: #3b82f6; }
+
+        /* ---- Message item ---- */
+        .msg-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.25rem 1.5rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: .75rem;
+            margin-bottom: .75rem;
+            cursor: pointer;
+            transition: box-shadow .2s, transform .2s;
+            position: relative;
+        }
+        .msg-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-1px); }
+        .msg-item--unread {
+            border-left: 4px solid #3b82f6;
+            background: #f8fbff;
+        }
+
+        /* ---- Avatar ---- */
+        .msg-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        /* ---- Item body ---- */
+        .msg-item__body { flex: 1; min-width: 0; }
+        .msg-item__top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: .25rem;
+        }
+        .msg-item__name  { font-weight: 600; color: #1e293b; }
+        .msg-item__date  { font-size: .75rem; color: #94a3b8; white-space: nowrap; }
+        .msg-item__subject {
+            font-size: .9rem;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: .25rem;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #3b82f6;
+            flex-shrink: 0;
+        }
+        .msg-item__preview {
+            font-size: .8rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .msg-item__email { font-size: .75rem; color: #94a3b8; margin-top: .25rem; }
+
+        /* ---- Item actions ---- */
+        .msg-item__actions {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            flex-shrink: 0;
+        }
+        .act-btn {
+            width: 32px; height: 32px;
+            border: none; border-radius: .375rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .8rem;
+            transition: opacity .2s;
+        }
+        .act-btn:hover { opacity: .8; }
+        .act-btn--blue { background: #eff6ff; color: #3b82f6; }
+        .act-btn--red  { background: #fef2f2; color: #ef4444; }
+
+        /* ---- Empty ---- */
+        .msg-empty {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #94a3b8;
+        }
+        .msg-empty i { font-size: 3.5rem; margin-bottom: 1rem; display: block; }
+
+        /* ---- Sidebar badge ---- */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: #ef4444;
+            color: white;
+            border-radius: 10px;
+            font-size: .7rem;
+            font-weight: 700;
+            margin-left: auto;
+        }
+
+        /* ---- Modal detail ---- */
+        .msg-detail-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: .5rem;
+            margin-bottom: 1.5rem;
+        }
+        .msg-body {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: .5rem;
+            padding: 1.5rem;
+            line-height: 1.8;
+            color: #334155;
+            white-space: pre-wrap;
+            font-size: .9375rem;
+        }
+
+        /* ---- Success button ---- */
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; }
+    </style>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Team - Admin Panel</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>PT TechNova</h2>
+            <p>Admin Panel</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="home.html"><i class="fas fa-laptop"></i> Kelola Home</a>
+            <a href="about.html"><i class="fas fa-info-circle"></i> Kelola About</a>
+            <a href="services.html"><i class="fas fa-briefcase"></i> Kelola Services</a>
+            <a href="team.html" class="active"><i class="fas fa-users"></i> Kelola Team</a>
+            <a href="contact.html"><i class="fas fa-envelope"></i> Kelola Contact</a>
+            <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <div>
+                <h1><i class="fas fa-users"></i> Kelola Team</h1>
+                <p style="margin:0;color:#64748b;font-size:.875rem;">Kelola anggota tim yang ditampilkan di website</p>
+            </div>
+            <div style="display:flex;gap:.75rem;">
+                <a href="../team.html" target="_blank" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-eye"></i> Lihat Website
+                </a>
+                <button class="btn btn-primary" onclick="showAddTeamModal()">
+                    <i class="fas fa-plus"></i> Tambah Team Member
+                </button>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <div id="teamList" class="team-grid"></div>
+        </div>
+    </main>
+
+    <div id="teamModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Tambah Team Member</h2>
+                <button class="modal-close" onclick="closeTeamModal()">&times;</button>
+            </div>
+            <form id="teamForm" onsubmit="handleTeamSubmit(event)">
+                <input type="hidden" id="teamId">
+                <div class="form-group">
+                    <label for="memberName">Nama *</label>
+                    <input type="text" id="memberName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="memberPosition">Posisi/Jabatan *</label>
+                    <input type="text" id="memberPosition" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="memberDescription">Deskripsi *</label>
+                    <textarea id="memberDescription" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Foto Member</label>
+                    <div id="memberPhotoUploader"></div>
+                    <!-- inputId "memberPhotoUrl" diinject oleh createImageUploader -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeTeamModal()">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin-sidebar.js"></script>
+    <script src="../js/admin-main.js"></script>
+    <script src="../js/image-uploader.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', async function() {
+            const isAdmin = await protectAdminPage();
+            if (isAdmin) await loadTeam();
+        });
+
+        function showAddTeamModal() {
+            document.getElementById('modalTitle').textContent = 'Tambah Team Member';
+            document.getElementById('teamForm').reset();
+            document.getElementById('teamId').value = '';
+            document.getElementById('teamModal').style.display = 'flex';
+            createImageUploader({
+                containerId: 'memberPhotoUploader',
+                inputId: 'memberPhotoUrl',
+                label: 'Foto Member'
+            });
+        }
+
+        async function editTeamMember(id) {
+            const team = await apiCall(API.team, { method: 'GET' });
+            const member = team.find(t => t.id === id);
+            if (!member) return showToast('Team member not found', 'error');
+
+            document.getElementById('modalTitle').textContent = 'Edit Team Member';
+            document.getElementById('teamId').value = member.id;
+            document.getElementById('memberName').value = member.name;
+            document.getElementById('memberPosition').value = member.position;
+            document.getElementById('memberDescription').value = member.description;
+            document.getElementById('teamModal').style.display = 'flex';
+
+            createImageUploader({
+                containerId: 'memberPhotoUploader',
+                inputId: 'memberPhotoUrl',
+                label: 'Foto Member',
+                currentUrl: member.photo_url || ''
+            });
+        }
+
+        function closeTeamModal() {
+            document.getElementById('teamModal').style.display = 'none';
+        }
+
+        async function handleTeamSubmit(e) {
+            e.preventDefault();
+            const memberData = {
+                id: document.getElementById('teamId').value || null,
+                name: document.getElementById('memberName').value,
+                position: document.getElementById('memberPosition').value,
+                description: document.getElementById('memberDescription').value,
+                photo_url: document.getElementById('memberPhotoUrl').value || null
+            };
+            await saveTeamMember(memberData);
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('teamModal')) closeTeamModal();
+        }
+    </script>
+
+    <style>
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .team-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .team-photo, .placeholder-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+        }
+        .placeholder-photo {
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+        .team-content h3 {
+            margin-bottom: 5px;
+        }
+        .team-content .position {
+            color: #2563eb;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .team-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+        }
+        .modal-content form {
+            padding: 20px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</body>
+</html>

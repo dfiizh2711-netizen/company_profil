@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contact PT TechNova Indonesia - Get in touch with our team">
+    <title>Contact Us - PT TechNova Indonesia</title>
+    
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="nav-brand">
+                    <img src="assets/images/logo.svg" alt="TechNova Logo" class="nav-logo" id="siteLogo"
+                         onerror="this.style.display='none'">
+                    <span class="nav-brand-text" id="siteName">TechNova</span>
+                </div>
+                
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="about.html" class="nav-link">About</a></li>
+                    <li><a href="services.html" class="nav-link">Services</a></li>
+                    <li><a href="team.html" class="nav-link">Team</a></li>
+                    <li><a href="contact.html" class="nav-link active">Contact</a></li>
+                </ul>
+                
+                <div class="nav-actions">
+                    <button class="btn btn-primary" onclick="window.location.href='contact.html'">Get Started</button>
+                    <button class="nav-toggle" id="navToggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-hero">
+        <div class="container">
+            <h1>Contact Us</h1>
+            <p>Get in touch with our team</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section">
+        <div class="container">
+            <div class="grid grid-2" style="align-items: start;">
+                <!-- Contact Info -->
+                <div>
+                    <h2 style="margin-bottom: 0.5rem;">Get In Touch</h2>
+                    <p style="margin-bottom: 2rem; color: var(--gray);">
+                        We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                    </p>
+
+                    <div class="contact-item">
+                        <div class="contact-item-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div>
+                            <h4 style="margin-bottom:0.25rem; color: var(--dark);">Alamat</h4>
+                            <p id="contactAddress" style="margin:0; color: var(--gray);">Loading...</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-item-icon"><i class="fas fa-envelope"></i></div>
+                        <div>
+                            <h4 style="margin-bottom:0.25rem; color: var(--dark);">Email</h4>
+                            <p id="contactEmail" style="margin:0; color: var(--gray);">Loading...</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-item-icon"><i class="fas fa-phone"></i></div>
+                        <div>
+                            <h4 style="margin-bottom:0.25rem; color: var(--dark);">Telepon</h4>
+                            <p id="contactPhone" style="margin:0; color: var(--gray);">Loading...</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-item-icon"><i class="fab fa-whatsapp"></i></div>
+                        <div>
+                            <h4 style="margin-bottom:0.25rem; color: var(--dark);">WhatsApp</h4>
+                            <p id="contactWhatsapp" style="margin:0; color: var(--gray);">Loading...</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        <h4 style="margin-bottom: 1rem; color: var(--dark);">Follow Us</h4>
+                        <div class="social-links">
+                            <a href="#" id="socialInstagram" target="_blank"><i class="fab fa-instagram"></i></a>
+                            <a href="#" id="socialFacebook" target="_blank"><i class="fab fa-facebook"></i></a>
+                            <a href="#" id="socialLinkedin" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div>
+                    <h2 style="margin-bottom: 1.5rem;">Kirim Pesan</h2>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label>Nama *</label>
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="Nama lengkap Anda">
+                        </div>
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="email@contoh.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Subjek *</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required placeholder="Topik pesan">
+                        </div>
+                        <div class="form-group">
+                            <label>Pesan *</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required placeholder="Tulis pesan Anda di sini..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" style="font-size:1rem; padding: 1rem;">
+                            <i class="fas fa-paper-plane"></i> Kirim Pesan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Google Maps -->
+    <section class="section" style="padding: 0;">
+        <iframe id="googleMaps" 
+                style="width: 100%; height: 400px; border: 0;" 
+                allowfullscreen="" 
+                loading="lazy">
+        </iframe>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>PT TechNova Indonesia</h3>
+                    <p id="footerText">Transforming Ideas Into Digital Solutions</p>
+                    <div class="social-links">
+                        <a href="#" id="instagramLink" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="#" id="facebookLink" target="_blank"><i class="fab fa-facebook"></i></a>
+                        <a href="#" id="linkedinLink" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="team.html">Team</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="services.html">Software Development</a></li>
+                        <li><a href="services.html">Web Development</a></li>
+                        <li><a href="services.html">Mobile Development</a></li>
+                        <li><a href="services.html">UI/UX Design</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> <span id="footerEmail">info@technova.id</span></li>
+                        <li><i class="fas fa-phone"></i> <span id="footerPhone">+62 21 1234 5678</span></li>
+                        <li><i class="fab fa-whatsapp"></i> <span id="footerWhatsapp">+62 812 3456 7890</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 PT TechNova Indonesia. All rights reserved.</p>
+                <p><a href="admin/login.html">Admin Login</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Services - PT TechNova Indonesia</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-brand">
+                <img src="../assets/images/logo.svg" alt="TechNova">
+                <h2>TechNova</h2>
+            </div>
+            
+            <ul class="admin-menu">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+                <li><a href="home.html"><i class="fas fa-globe"></i> <span>Kelola Home</span></a></li>
+                <li><a href="about.html"><i class="fas fa-info-circle"></i> <span>Kelola About</span></a></li>
+                <li><a href="services.html" class="active"><i class="fas fa-briefcase"></i> <span>Kelola Services</span></a></li>
+                <li><a href="team.html"><i class="fas fa-users"></i> <span>Kelola Team</span></a></li>
+                <li><a href="contact.html"><i class="fas fa-envelope"></i> <span>Kelola Contact</span></a></li>
+                <li><a href="media.html"><i class="fas fa-images"></i> <span>Media Manager</span></a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Website Settings</span></a></li>
+                <li style="margin-top: var(--spacing-lg); border-top: 1px solid var(--dark-light); padding-top: var(--spacing-lg);">
+                    <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <h1>Manage Services</h1>
+                <div class="admin-user">
+                    <div class="admin-user-avatar" id="userAvatar">A</div>
+                    <span id="userName">Admin</span>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="admin-content">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h2>Services List</h2>
+                        <button class="btn btn-primary" onclick="openAddModal()">
+                            <i class="fas fa-plus"></i> Add Service
+                        </button>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="80">Image</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th width="150">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="servicesTableBody">
+                                <tr>
+                                    <td colspan="4" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="serviceModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Service</h3>
+            </div>
+            <div class="modal-body">
+                <form id="serviceForm">
+                    <input type="hidden" id="serviceId">
+                    <input type="hidden" id="currentImageUrl">
+                    
+                    <div class="form-group">
+                        <label>Service Name *</label>
+                        <input type="text" class="form-control" id="serviceName" required 
+                               placeholder="e.g. Web Development">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description *</label>
+                        <textarea class="form-control" id="serviceDescription" rows="5" required
+                                  placeholder="Describe the service in detail..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Service Image (Optional)</label>
+                        <input type="file" class="form-control" id="serviceImage" 
+                               accept="image/*" onchange="previewServiceImage(event)">
+                        <small style="color: var(--gray);">Max 5MB. JPG, PNG, or SVG</small>
+                        <img id="serviceImagePreview" class="image-upload-preview" 
+                             style="display: none; margin-top: 1rem;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn btn-primary" onclick="saveService()">
+                    <i class="fas fa-save"></i> Save Service
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/config.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/auth.js"></script>
+    
+    <script>
+        // Initialize
+        window.addEventListener('DOMContentLoaded', async function() {
+            const isAuthorized = await protectAdminPage();
+            if (isAuthorized) {
+                await loadServices();
+                await loadUserInfo();
+            }
+        });
+
+        // Load all services
+        async function loadServices() {
+            try {
+                const { data: services, error } = await supabaseClient
+                    .from('services')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                const tbody = document.getElementById('servicesTableBody');
+                
+                if (services && services.length > 0) {
+                    tbody.innerHTML = services.map(service => `
+                        <tr>
+                            <td>
+                                ${service.image_url ? 
+                                    `<img src="${service.image_url}" 
+                                          style="width: 60px; height: 60px; object-fit: cover; 
+                                                 border-radius: var(--radius-md); border: 2px solid var(--gray-light);">` : 
+                                    `<div style="width: 60px; height: 60px; background: var(--light); 
+                                                border-radius: var(--radius-md); display: flex; align-items: center; 
+                                                justify-content: center; color: var(--gray);">
+                                         <i class="fas fa-image"></i>
+                                     </div>`}
+                            </td>
+                            <td><strong>${service.name}</strong></td>
+                            <td>${truncateText(service.description, 120)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" 
+                                        onclick='editService(${JSON.stringify(service).replace(/'/g, "&apos;")})'>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm" 
+                                        style="background: var(--error); color: white;"
+                                        onclick="deleteService('${service.id}', '${service.name}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center" style="padding: 3rem;">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">
+                                        <i class="fas fa-briefcase"></i>
+                                    </div>
+                                    <h3>No Services Yet</h3>
+                                    <p>Click "Add Service" to create your first service.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading services:', error);
+                showToast('Failed to load services', 'error');
+            }
+        }
+
+        // Open add modal
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add Service';
+            document.getElementById('serviceForm').reset();
+            document.getElementById('serviceId').value = '';
+            document.getElementById('currentImageUrl').value = '';
+            document.getElementById('serviceImagePreview').style.display = 'none';
+            document.getElementById('serviceModal').style.display = 'flex';
+        }
+
+        // Edit service
+        function editService(service) {
+            document.getElementById('modalTitle').textContent = 'Edit Service';
+            document.getElementById('serviceId').value = service.id;
+            document.getElementById('serviceName').value = service.name;
+            document.getElementById('serviceDescription').value = service.description;
+            document.getElementById('currentImageUrl').value = service.image_url || '';
+            
+            if (service.image_url) {
+                const preview = document.getElementById('serviceImagePreview');
+                preview.src = service.image_url;
+                preview.style.display = 'block';
+            } else {
+                document.getElementById('serviceImagePreview').style.display = 'none';
+            }
+            
+            document.getElementById('serviceModal').style.display = 'flex';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('serviceModal').style.display = 'none';
+        }
+
+        // Preview image before upload
+        function previewServiceImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Check file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('File size must be less than 5MB', 'warning');
+                    event.target.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('serviceImagePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Save service (Create or Update)
+        async function saveService() {
+            try {
+                // Validate form
+                const name = document.getElementById('serviceName').value.trim();
+                const description = document.getElementById('serviceDescription').value.trim();
+                
+                if (!name || !description) {
+                    showToast('Please fill in all required fields', 'warning');
+                    return;
+                }
+                
+                showLoading();
+                
+                const id = document.getElementById('serviceId').value;
+                const fileInput = document.getElementById('serviceImage');
+                let imageUrl = document.getElementById('currentImageUrl').value;
+                
+                // Upload new image if selected
+                if (fileInput.files.length > 0) {
+                    const result = await uploadToSupabase(fileInput.files[0], 'services');
+                    if (result.success) {
+                        imageUrl = result.url;
+                    } else {
+                        hideLoading();
+                        showToast('Failed to upload image', 'error');
+                        return;
+                    }
+                }
+                
+                const serviceData = {
+                    name,
+                    description,
+                    image_url: imageUrl || null
+                };
+                
+                let error;
+                if (id) {
+                    // Update existing service
+                    ({ error } = await supabaseClient
+                        .from('services')
+                        .update(serviceData)
+                        .eq('id', id));
+                } else {
+                    // Insert new service
+                    ({ error } = await supabaseClient
+                        .from('services')
+                        .insert([serviceData]));
+                }
+                
+                hideLoading();
+                
+                if (error) throw error;
+                
+                showToast(`Service ${id ? 'updated' : 'created'} successfully!`, 'success');
+                closeModal();
+                await loadServices();
+            } catch (error) {
+                hideLoading();
+                showToast('Failed to save service', 'error');
+                console.error('Error saving service:', error);
+            }
+        }
+
+        // Delete service
+        async function deleteService(id, name) {
+            // Confirmation
+            const confirmed = confirm(`Are you sure you want to delete "${name}"?\n\nThis action cannot be undone.`);
+            if (!confirmed) return;
+            
+            try {
+                showLoading();
+                
+                const { error } = await supabaseClient
+                    .from('services')
+                    .delete()
+                    .eq('id', id);
+                
+                hideLoading();
+                
+                if (error) throw error;
+                
+                showToast('Service deleted successfully!', 'success');
+                await loadServices();
+            } catch (error) {
+                hideLoading();
+                showToast('Failed to delete service', 'error');
+                console.error('Error deleting service:', error);
+            }
+        }
+
+        // Load user info
+        async function loadUserInfo() {
+            try {
+                const user = await getCurrentUser();
+                if (user) {
+                    const userName = user.email.split('@')[0];
+                    document.getElementById('userName').textContent = userName;
+                    document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('serviceModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

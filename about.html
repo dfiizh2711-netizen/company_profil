@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn about PT TechNova Indonesia - Our history, vision, mission, and values">
+    <title>About Us - PT TechNova Indonesia</title>
+    
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="nav-brand">
+                    <img src="assets/images/logo.svg" alt="TechNova Logo" class="nav-logo" id="siteLogo">
+                    <span class="nav-brand-text" id="siteName">TechNova</span>
+                </div>
+                
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="about.html" class="nav-link active">About</a></li>
+                    <li><a href="services.html" class="nav-link">Services</a></li>
+                    <li><a href="team.html" class="nav-link">Team</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                </ul>
+                
+                <div class="nav-actions">
+                    <button class="btn btn-primary" onclick="window.location.href='contact.html'">Get Started</button>
+                    <button class="nav-toggle" id="navToggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-hero">
+        <div class="container">
+            <h1>About PT TechNova Indonesia</h1>
+            <p>Your Trusted Technology Partner</p>
+        </div>
+    </section>
+
+    <!-- Company History -->
+    <section class="section">
+        <div class="container">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl); align-items:center;" class="about-grid">
+                <div>
+                    <h2>Company History</h2>
+                    <p id="companyHistory" style="line-height: 1.9; font-size: 1.0625rem;">
+                        Loading...
+                    </p>
+                </div>
+                <div>
+                    <img id="companyImage" src="../assets/images/office.jpg" alt="Company"
+                         style="width:100%; border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); object-fit:cover; max-height:400px;"
+                         onerror="this.style.display='none'">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vision & Mission -->
+    <section class="section bg-light">
+        <div class="container">
+            <div class="section-header text-center">
+                <h2>Vision &amp; Mission</h2>
+                <p>What drives us forward every day</p>
+            </div>
+            <div class="grid grid-2">
+                <div class="feature-card" style="text-align:left;">
+                    <div class="feature-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>Our Vision</h3>
+                    <p id="vision" style="font-size: 1.0625rem; line-height: 1.8;">Loading...</p>
+                </div>
+                <div class="feature-card" style="text-align:left;">
+                    <div class="feature-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3>Our Mission</h3>
+                    <p id="mission" style="font-size: 1.0625rem; line-height: 1.8;">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Company Values -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header text-center">
+                <h2>Our Values</h2>
+                <p>The principles that guide everything we do</p>
+            </div>
+            <div id="valuesContainer" class="values-grid">
+                <!-- Rendered dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section cta-section">
+        <div class="container text-center">
+            <h2>Ready to Work With Us?</h2>
+            <p>Let's discuss how we can help transform your business</p>
+            <div class="cta-actions">
+                <a href="contact.html" class="btn btn-primary btn-lg">Contact Us Today</a>
+                <a href="services.html" class="btn btn-secondary btn-lg">View Our Services</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>PT TechNova Indonesia</h3>
+                    <p id="footerText">Transforming Ideas Into Digital Solutions</p>
+                    <div class="social-links">
+                        <a href="#" id="instagramLink"><i class="fab fa-instagram"></i></a>
+                        <a href="#" id="facebookLink"><i class="fab fa-facebook"></i></a>
+                        <a href="#" id="linkedinLink"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="team.html">Team</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> <span id="footerEmail">info@technova.id</span></li>
+                        <li><i class="fas fa-phone"></i> <span id="footerPhone">+62 21 1234 5678</span></li>
+                        <li><i class="fab fa-whatsapp"></i> <span id="footerWhatsapp">+62 812 3456 7890</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 PT TechNova Indonesia. All rights reserved.</p>
+                <p><a href="admin/login.html">Admin Login</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadPageSettings();
+            await loadAboutContent();
+            await loadFooterContact();
+        });
+
+        async function loadPageSettings() {
+            try {
+                const data = await apiCall(API.settings, { method: 'GET' });
+                if (data) {
+                    document.querySelectorAll('#siteName').forEach(el => el.textContent = data.site_name || 'TechNova');
+                    if (data.logo_url) { document.getElementById('siteLogo').src = data.logo_url; }
+                    if (data.footer_text) { document.getElementById('footerText').textContent = data.footer_text; }
+                    if (data.primary_color) { document.documentElement.style.setProperty('--primary', data.primary_color); }
+                }
+            } catch(e) { console.warn('Settings:', e.message); }
+        }
+
+        async function loadAboutContent() {
+            try {
+                const data = await apiCall(API.about, { method: 'GET' });
+                if (data && Object.keys(data).length > 0) {
+                    document.getElementById('companyHistory').textContent = data.company_history || '';
+                    document.getElementById('vision').textContent = data.vision || '';
+                    document.getElementById('mission').textContent = data.mission || '';
+                    if (data.company_image_url) { document.getElementById('companyImage').src = data.company_image_url; }
+                    
+                    // Display values as formatted list using new values-grid class
+                    if (data.company_values) {
+                        const values = data.company_values.split(/[\n.]/).filter(v => v.trim());
+                        document.getElementById('valuesContainer').innerHTML = values.map(v => {
+                            const parts = v.trim().split(':');
+                            const label = parts.length > 1 ? parts[0].trim() : v.trim();
+                            const desc  = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
+                            return `<div class="value-item">
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong style="color:var(--dark);">${label}</strong>
+                                    ${desc ? `<span style="color:var(--gray);"> — ${desc}</span>` : ''}
+                                </div>
+                            </div>`;
+                        }).join('');
+                    }
+                }
+            } catch(e) {
+                showToast('Failed to load content', 'error');
+                console.error('About:', e.message);
+            }
+        }
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/main.js"></script>
+    <style>
+        .about-grid { display:grid!important; grid-template-columns:1fr 1fr!important; gap:var(--spacing-xl); align-items:center; }
+        @media (max-width:768px) {
+            .about-grid { grid-template-columns:1fr!important; }
+            .about-grid > div:last-child { order:-1; }
+            #companyImage { max-height:260px; object-fit:cover; }
+        }
+    </style>
+</body>
+</html>

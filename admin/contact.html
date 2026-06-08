@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Contact - Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <aside class="admin-sidebar"></aside>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <div>
+                <h1><i class="fas fa-envelope"></i> Kelola Contact</h1>
+                <p style="margin:0;color:#64748b;font-size:.875rem;">Informasi kontak yang ditampilkan di website</p>
+            </div>
+            <a href="../contact.html" target="_blank" class="btn btn-secondary btn-sm">
+                <i class="fas fa-eye"></i> Lihat Halaman Contact
+            </a>
+        </header>
+
+        <div class="admin-content">
+            <div style="display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start;">
+
+                <!-- LEFT: Form -->
+                <div>
+                    <form id="contactForm" onsubmit="handleContactSubmit(event)">
+
+                        <!-- Contact Details -->
+                        <div class="content-card" style="margin-bottom:1.25rem;">
+                            <h3><i class="fas fa-address-card" style="color:#3b82f6;margin-right:.5rem;"></i> Detail Kontak</h3>
+                            <div class="form-group">
+                                <label for="address">Alamat *</label>
+                                <textarea id="address" class="form-control" rows="3" required
+                                          placeholder="Jl. Sudirman No. 123, Jakarta Selatan..." oninput="updateContactPreview()"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="email">Email *</label>
+                                    <input type="email" id="email" class="form-control" required
+                                           placeholder="info@company.com" oninput="updateContactPreview()">
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">Telepon *</label>
+                                    <input type="text" id="phone" class="form-control" required
+                                           placeholder="+62 21 1234 5678" oninput="updateContactPreview()">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label for="whatsapp">WhatsApp *</label>
+                                <input type="text" id="whatsapp" class="form-control" required
+                                       placeholder="+62 812 3456 7890" oninput="updateContactPreview()">
+                            </div>
+                        </div>
+
+                        <!-- Maps -->
+                        <div class="content-card" style="margin-bottom:1.25rem;">
+                            <h3><i class="fas fa-map-marked-alt" style="color:#ef4444;margin-right:.5rem;"></i> Google Maps</h3>
+                            <div class="form-group" style="margin-bottom:.75rem;">
+                                <label for="mapsLink">Google Maps Embed URL *</label>
+                                <input type="text" id="mapsLink" class="form-control" required
+                                       placeholder="https://www.google.com/maps/embed?pb=...">
+                            </div>
+                            <p style="font-size:.8rem;color:#64748b;margin:0;">
+                                <i class="fas fa-info-circle" style="color:#3b82f6;"></i>
+                                Buka <a href="https://maps.google.com" target="_blank">Google Maps</a>,
+                                cari lokasi, klik Share → Embed a map, copy src URL-nya.
+                            </p>
+                        </div>
+
+                        <!-- Social Media -->
+                        <div class="content-card" style="margin-bottom:1.25rem;">
+                            <h3><i class="fas fa-share-alt" style="color:#8b5cf6;margin-right:.5rem;"></i> Social Media</h3>
+                            <div class="form-group">
+                                <label for="instagram">
+                                    <i class="fab fa-instagram" style="color:#e1306c;"></i> Instagram URL
+                                </label>
+                                <input type="url" id="instagram" class="form-control"
+                                       placeholder="https://instagram.com/yourcompany">
+                            </div>
+                            <div class="form-group">
+                                <label for="facebook">
+                                    <i class="fab fa-facebook" style="color:#1877f2;"></i> Facebook URL
+                                </label>
+                                <input type="url" id="facebook" class="form-control"
+                                       placeholder="https://facebook.com/yourcompany">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label for="linkedin">
+                                    <i class="fab fa-linkedin" style="color:#0a66c2;"></i> LinkedIn URL
+                                </label>
+                                <input type="url" id="linkedin" class="form-control"
+                                       placeholder="https://linkedin.com/company/yourcompany">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width:100%;padding:1rem;font-size:1rem;">
+                            <i class="fas fa-save"></i> Simpan Semua Perubahan
+                        </button>
+                    </form>
+                </div>
+
+                <!-- RIGHT: Preview -->
+                <div style="position:sticky;top:80px;">
+                    <div class="content-card" style="padding:0;overflow:hidden;">
+                        <div style="padding:.875rem 1.25rem;background:#1e293b;display:flex;align-items:center;gap:.75rem;">
+                            <div style="display:flex;gap:5px;">
+                                <span style="width:12px;height:12px;border-radius:50%;background:#ef4444;display:block;"></span>
+                                <span style="width:12px;height:12px;border-radius:50%;background:#f59e0b;display:block;"></span>
+                                <span style="width:12px;height:12px;border-radius:50%;background:#22c55e;display:block;"></span>
+                            </div>
+                            <span style="color:#94a3b8;font-size:.75rem;flex:1;text-align:center;">Preview Contact</span>
+                        </div>
+                        <div style="padding:1.25rem;">
+                            <!-- Address -->
+                            <div style="display:flex;gap:.75rem;margin-bottom:1rem;align-items:flex-start;">
+                                <div style="width:32px;height:32px;background:#fef2f2;border-radius:.375rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fas fa-map-marker-alt" style="color:#ef4444;font-size:.7rem;"></i>
+                                </div>
+                                <div>
+                                    <p style="font-size:.6rem;font-weight:700;color:#94a3b8;margin-bottom:.2rem;text-transform:uppercase;">Alamat</p>
+                                    <p id="prev_address" style="font-size:.72rem;color:#334155;margin:0;line-height:1.4;"></p>
+                                </div>
+                            </div>
+                            <!-- Email -->
+                            <div style="display:flex;gap:.75rem;margin-bottom:1rem;align-items:center;">
+                                <div style="width:32px;height:32px;background:#eff6ff;border-radius:.375rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fas fa-envelope" style="color:#3b82f6;font-size:.7rem;"></i>
+                                </div>
+                                <p id="prev_email" style="font-size:.72rem;color:#334155;margin:0;"></p>
+                            </div>
+                            <!-- Phone -->
+                            <div style="display:flex;gap:.75rem;margin-bottom:1rem;align-items:center;">
+                                <div style="width:32px;height:32px;background:#f0fdf4;border-radius:.375rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fas fa-phone" style="color:#22c55e;font-size:.7rem;"></i>
+                                </div>
+                                <p id="prev_phone" style="font-size:.72rem;color:#334155;margin:0;"></p>
+                            </div>
+                            <!-- WhatsApp -->
+                            <div style="display:flex;gap:.75rem;align-items:center;">
+                                <div style="width:32px;height:32px;background:#f0fdf4;border-radius:.375rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fab fa-whatsapp" style="color:#22c55e;font-size:.7rem;"></i>
+                                </div>
+                                <p id="prev_whatsapp" style="font-size:.72rem;color:#334155;margin:0;"></p>
+                            </div>
+                        </div>
+                        <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:.75rem 1.25rem;text-align:center;">
+                            <a href="../public/contact.html" target="_blank" style="font-size:.7rem;color:#3b82f6;">
+                                <i class="fas fa-external-link-alt"></i> Buka tampilan penuh
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin-sidebar.js"></script>
+    <script src="../js/admin-main.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', async function() {
+            const isAdmin = await protectAdminPage();
+            if (isAdmin) await loadContactInfo();
+        });
+
+        function updateContactPreview() {
+            document.getElementById('prev_address').textContent  = document.getElementById('address')?.value || '';
+            document.getElementById('prev_email').textContent    = document.getElementById('email')?.value || '';
+            document.getElementById('prev_phone').textContent    = document.getElementById('phone')?.value || '';
+            document.getElementById('prev_whatsapp').textContent = document.getElementById('whatsapp')?.value || '';
+        }
+
+        async function handleContactSubmit(e) {
+            e.preventDefault();
+            const formData = {
+                address:   document.getElementById('address').value,
+                email:     document.getElementById('email').value,
+                phone:     document.getElementById('phone').value,
+                whatsapp:  document.getElementById('whatsapp').value,
+                maps_link: document.getElementById('mapsLink').value,
+                instagram: document.getElementById('instagram').value || null,
+                facebook:  document.getElementById('facebook').value || null,
+                linkedin:  document.getElementById('linkedin').value || null
+            };
+            await saveContactInfo(formData);
+        }
+    </script>
+
+    <style>
+        .content-card { background:white; border-radius:.75rem; padding:1.75rem; border:1px solid #e2e8f0; }
+        .content-card h3 { margin:0 0 1.25rem; font-size:1rem; color:#1e293b; }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+        @media (max-width:900px) {
+            .admin-content > div { grid-template-columns:1fr !important; }
+            .form-row { grid-template-columns:1fr !important; }
+        }
+    </style>
+</body>
+</html>
